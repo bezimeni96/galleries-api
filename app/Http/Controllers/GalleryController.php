@@ -37,9 +37,10 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function show(Gallery $gallery)
+    public function show($id)
     {
-        //
+        $gallery = Gallery::with('author', 'images')->findOrFail($id);
+        return $gallery;
     }
 
     /**
