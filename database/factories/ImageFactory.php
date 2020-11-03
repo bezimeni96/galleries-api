@@ -23,7 +23,7 @@ class ImageFactory extends Factory
     {
         return [
             'url' => $this->faker->imageUrl(240,240),
-            'gallery_id' => $this->faker->numberBetween(1, 20),
+            'gallery_id' => $this->faker->numberBetween(1, 10),
             'order_index' => $this->faker->randomDigit,
         ];
     }
