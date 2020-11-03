@@ -14,7 +14,10 @@ class GalleryController extends Controller
      */
     public function index()
     {
-        //
+        $galleries = Gallery::with('author', 'images')
+            ->orderBy('created_at', 'desc')->limit(10)->get();
+
+        return $galleries;
     }
 
     /**

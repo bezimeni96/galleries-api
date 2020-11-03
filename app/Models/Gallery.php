@@ -20,6 +20,6 @@ class Gallery extends Model
     }
 
     public function images() {
-        return $this->hasMany('App\Model\Image');
+        return $this->hasMany('App\Models\Image');
     }
 }
