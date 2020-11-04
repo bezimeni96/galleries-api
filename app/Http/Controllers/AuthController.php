@@ -21,7 +21,13 @@ class AuthController extends Controller
         if (!$token) {
             abort(401, 'Invalid credentials');
         }
-        return ['token' => $token];
+
+        $user = auth()->user();
+
+        return [
+            'token' => $token,
+            'user' => $user
+        ];
     }
 
     public function refreshToken() {
@@ -45,6 +51,7 @@ class AuthController extends Controller
             "password" => Hash::make($data['password']),
             "remember_token" => Str::random(10),
         ]);
-        return $user;
+        
+        return $this->login($request);
     }
 }
