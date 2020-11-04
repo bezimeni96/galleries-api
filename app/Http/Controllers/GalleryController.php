@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateGalleryRequest;
 use App\Models\Gallery;
+use App\Models\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GalleryController extends Controller
 {
@@ -26,9 +29,26 @@ class GalleryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateGalleryRequest $request)
     {
-        //
+        $data = $request->validated();
+        $gallery = Gallery::create([
+            "title" => $data['title'],
+            "description" => $data['description'],
+            "author_id" => 5
+        ]);
+        
+        $count = 1;
+        foreach ($data['images'] as $image_url) {
+            $image = Image::create([
+                "url" => $image_url,
+                "order_index" => $count,
+                "gallery_id" => $gallery['id'],
+            ]);
+            $count++;
+        };
+
+        return $gallery;
     }
 
     /**
@@ -61,8 +81,13 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Gallery $gallery)
+    public function destroy($id)
     {
-        //
+        $gallery = Gallery::findOrFail($id);
+        
+        Image::where('gallery_id', $id)->delete();
+        $gallery->delete();
+
+        return $gallery;
     }
 }

@@ -21,3 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/galleries', [GalleryController::class, 'index']);
 Route::get('/galleries/{id}', [GalleryController::class, 'show']);
+Route::post('/galleries', [GalleryController::class, 'store']);
+Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
