@@ -116,9 +116,13 @@ class GalleryController extends Controller
     public function destroy($id)
     {
         $gallery = Gallery::findOrFail($id);
+        $user = auth()->user()->id;
 
-        Image::where('gallery_id', $id)->delete();
-        $gallery->delete();
+        if ( $gallery['author_id'] === $user) {
+            Image::where('gallery_id', $id)->delete();
+            $gallery->delete();
+        }
+
 
         return $gallery;
         
