@@ -33,12 +33,12 @@ class GalleryController extends Controller
     public function store(CreateGalleryRequest $request)
     {
         $data = $request->validated();
-        $user = User::findOrFail($request['user_id']);
+        $user = auth()->user()->id;
 
         $gallery = Gallery::create([
             "title" => $data['title'],
             "description" => $data['description'],
-            "author_id" => $user['id']
+            "author_id" => $user
         ]);
         
         $count = 1;
@@ -79,9 +79,32 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Gallery $gallery)
+    public function update(Request $request, $id)
     {
-        //
+        $user = auth()->user()->id;
+
+        $gallery = Gallery::find($id);
+        $gallery->title = $request->title;
+        $gallery->description = $request->description;
+        $gallery->user_id = $user;
+        $gallery->save(); 
+        
+        $count=1;
+        foreach(request('images') as $img) {
+            $image = Image::findOrFail($img.id);
+            if (!$image) {
+                $image = Image::create([
+                    "url" => $image_url,
+                    "order_index" => $count,
+                    "gallery_id" => $gallery['id'],
+                ]);
+            } else {
+                $image->url = $img->url;
+                $image->order_index = $img->order_index;
+            };
+            $count++;
+        }
+        return $gallery;
     }
 
     /**
@@ -93,10 +116,11 @@ class GalleryController extends Controller
     public function destroy($id)
     {
         $gallery = Gallery::findOrFail($id);
-        
+
         Image::where('gallery_id', $id)->delete();
         $gallery->delete();
 
         return $gallery;
+        
     }
 }
