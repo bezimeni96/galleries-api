@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateGalleryRequest;
 use App\Models\Gallery;
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,12 +33,12 @@ class GalleryController extends Controller
     public function store(CreateGalleryRequest $request)
     {
         $data = $request->validated();
-        $user = auth()->user();
+        $user = User::findOrFail($request['user_id']);
 
         $gallery = Gallery::create([
             "title" => $data['title'],
             "description" => $data['description'],
-            "author_id" => 5
+            "author_id" => $user['id']
         ]);
         
         $count = 1;
@@ -63,6 +64,12 @@ class GalleryController extends Controller
     {
         $gallery = Gallery::with('author', 'images')->findOrFail($id);
         return $gallery;
+    }
+
+
+    public function showAuthor($id)
+    {
+        return Gallery::with('author', 'images')->where('author_id', $id)->orderBy('created_at', 'desc')->get();
     }
 
     /**

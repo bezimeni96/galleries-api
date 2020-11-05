@@ -28,4 +28,6 @@ Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
 Route::post('/logout', [AuthController::class, 'logout']);
-Route::post('/register', [AuthController::class, 'register']); 
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::get('/authors/{id}', [GalleryController::class, 'showAuthor']);
