@@ -32,6 +32,8 @@ class GalleryController extends Controller
     public function store(CreateGalleryRequest $request)
     {
         $data = $request->validated();
+        $user = auth()->user();
+
         $gallery = Gallery::create([
             "title" => $data['title'],
             "description" => $data['description'],
