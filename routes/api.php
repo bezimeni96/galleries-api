@@ -4,6 +4,7 @@ use App\Http\Controllers\GalleryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,4 +38,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/galleries/{id}', [GalleryController::class, 'update']);
     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
     Route::post('/galleries', [GalleryController::class, 'store']);
+    Route::post('/galleries/{id}/comments', [CommentController::class, 'store']);
+    Route::delete('/comments', [CommentController::class, 'destroy']);
 });

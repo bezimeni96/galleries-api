@@ -22,4 +22,8 @@ class Gallery extends Model
     public function images() {
         return $this->hasMany('App\Models\Image');
     }
+
+    public function comments() {
+        return $this->hasMany('App\Models\Comment');
+    }
 }
