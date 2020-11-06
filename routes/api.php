@@ -24,17 +24,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/galleries', [GalleryController::class, 'index']);
 Route::get('/galleries/{id}', [GalleryController::class, 'show']);
 // Route::post('/galleries', [GalleryController::class, 'store']);
-Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
-Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/authors/{id}', [GalleryController::class, 'showAuthor']);
 
 
 Route::group(['middleware' => 'auth:api'], function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
     Route::put('/galleries/{id}', [GalleryController::class, 'update']);
     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
     Route::post('/galleries', [GalleryController::class, 'store']);

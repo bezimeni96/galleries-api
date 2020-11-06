@@ -19,11 +19,11 @@ class GalleryController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request['word'];
+        $search = $request->get('word', '');
+        $skip = $request->get('skip', 0);
 
         $galleriesQuery = Gallery::query();
         $galleriesQuery->with('author', 'images');
-        
         
         $galleriesQuery->where( functioN($query) use ($search) {
             $query->where('title', 'like', '%' . $search . '%')
@@ -33,11 +33,15 @@ class GalleryController extends Controller
                         ->orWhere('last_name', 'like', '%' . $search . '%');
                 });
         });
-        
 
-        $galleries = $galleriesQuery->orderBy('created_at', 'desc')->limit(10)->get();
         
-        return $galleries;
+        $galleries = $galleriesQuery->orderBy('created_at', 'desc')
+            ->skip(($skip) * 10)
+            ->take(10)
+            ->get();
+        
+        $count = $galleriesQuery->count();
+        return [$galleries, $count];
     }
 
     /**
@@ -104,11 +108,6 @@ class GalleryController extends Controller
         $galleries = $galleriesQuery->orderBy('created_at', 'desc')->limit(10)->get();
         
         return $galleries;
-
-        // return Gallery::with('author', 'images')
-        //     ->where('author_id', $id)
-        //     ->orderBy('created_at', 'desc')
-        //     ->get();
     }
 
     /**
