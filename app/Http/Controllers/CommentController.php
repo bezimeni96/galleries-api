@@ -35,6 +35,8 @@ class CommentController extends Controller
             "gallery_id" => $id,
             "user_id" => $user
         ]);
+
+        return $comment;
     }
 
     /**

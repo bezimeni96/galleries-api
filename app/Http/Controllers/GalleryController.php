@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateGalleryRequest;
 use App\Models\Gallery;
 use App\Models\Image;
+use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +17,26 @@ class GalleryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $galleries = Gallery::with('author', 'images')
-            ->orderBy('created_at', 'desc')->limit(10)->get();
+        $search = $request['word'];
 
+        $galleriesQuery = Gallery::query();
+        $galleriesQuery->with('author', 'images');
+        
+        
+        $galleriesQuery->where( functioN($query) use ($search) {
+            $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%')
+                ->orwhereHas('author', function($que) use ($search) {
+                    $que->where('first_name', 'like', '%' . $search . '%')
+                        ->orWhere('last_name', 'like', '%' . $search . '%');
+                });
+        });
+        
+
+        $galleries = $galleriesQuery->orderBy('created_at', 'desc')->limit(10)->get();
+        
         return $galleries;
     }
 
@@ -62,14 +78,37 @@ class GalleryController extends Controller
      */
     public function show($id)
     {
-        $gallery = Gallery::with('author', 'images')->findOrFail($id);
+        $gallery = Gallery::with('author', 'images', 'comments.user')->findOrFail($id);
         return $gallery;
     }
 
 
-    public function showAuthor($id)
+    public function showAuthor(Request $request, $id)
     {
-        return Gallery::with('author', 'images')->where('author_id', $id)->orderBy('created_at', 'desc')->get();
+        $search = $request['word'];
+
+        $galleriesQuery = Gallery::query();
+        $galleriesQuery->with('author', 'images')->where('author_id', $id);
+        
+        
+        $galleriesQuery->where( functioN($query) use ($search) {
+            $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%')
+                ->orwhereHas('author', function($que) use ($search) {
+                    $que->where('first_name', 'like', '%' . $search . '%')
+                        ->orWhere('last_name', 'like', '%' . $search . '%');
+                });
+        });
+        
+
+        $galleries = $galleriesQuery->orderBy('created_at', 'desc')->limit(10)->get();
+        
+        return $galleries;
+
+        // return Gallery::with('author', 'images')
+        //     ->where('author_id', $id)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
     }
 
     /**
@@ -91,16 +130,16 @@ class GalleryController extends Controller
         
         $count=1;
         foreach(request('images') as $img) {
-            $image = Image::findOrFail($img.id);
+            $image = Image::find($img->id);
             if (!$image) {
                 $image = Image::create([
-                    "url" => $image_url,
+                    "url" => $img->url,
                     "order_index" => $count,
                     "gallery_id" => $gallery['id'],
                 ]);
             } else {
                 $image->url = $img->url;
-                $image->order_index = $img->order_index;
+                $image->order_index = $count;
             };
             $count++;
         }
@@ -120,6 +159,7 @@ class GalleryController extends Controller
 
         if ( $gallery['author_id'] === $user) {
             Image::where('gallery_id', $id)->delete();
+            Comment::where('gallery_id', $id)->delete();
             $gallery->delete();
         }
 
