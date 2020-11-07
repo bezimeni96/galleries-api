@@ -22,7 +22,7 @@ class ImageFactory extends Factory
     public function definition()
     {
         return [
-            'url' => $this->faker->imageUrl(240,240),
+            'url' => 'https://www.freedigitalphotos.net/images/img/homepage/394230.jpg',
             'gallery_id' => $this->faker->numberBetween(1, 10),
             'order_index' => $this->faker->randomDigit,
         ];

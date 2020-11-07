@@ -20,7 +20,7 @@ class Gallery extends Model
     }
 
     public function images() {
-        return $this->hasMany('App\Models\Image');
+        return $this->hasMany('App\Models\Image')->orderBy('order_index');
     }
 
     public function comments() {

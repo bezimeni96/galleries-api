@@ -90,20 +90,20 @@ class GalleryController extends Controller
 
     public function showAuthor(Request $request, $id)
     {
-        $search = $request['word'];
+        // $search = $request['word'];
 
         $galleriesQuery = Gallery::query();
         $galleriesQuery->with('author', 'images')->where('author_id', $id);
         
         
-        $galleriesQuery->where( functioN($query) use ($search) {
-            $query->where('title', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%')
-                ->orwhereHas('author', function($que) use ($search) {
-                    $que->where('first_name', 'like', '%' . $search . '%')
-                        ->orWhere('last_name', 'like', '%' . $search . '%');
-                });
-        });
+        // $galleriesQuery->where( function($query) use ($search) {
+        //     $query->where('title', 'like', '%' . $search . '%')
+        //         ->orWhere('description', 'like', '%' . $search . '%')
+        //         ->orwhereHas('author', function($que) use ($search) {
+        //             $que->where('first_name', 'like', '%' . $search . '%')
+        //                 ->orWhere('last_name', 'like', '%' . $search . '%');
+        //         });
+        // });
         
 
         $galleries = $galleriesQuery->orderBy('created_at', 'desc')->limit(10)->get();
@@ -126,9 +126,10 @@ class GalleryController extends Controller
         if ($gallery['author_id'] == $user) {
             $gallery->title = $request->title;
             $gallery->description = $request->description;
+            $oldImages = Image::where('gallery_id', $gallery->id)->get();
             
             $count=1;
-            
+            $newImages = [];
             foreach($request->images as $img) {
                 if (!isset($img['id'])) {
                     $image = Image::create([
@@ -141,8 +142,16 @@ class GalleryController extends Controller
                         $img['order_index'] = $count;
                         $image->update($img);
                     };
+                    $newImages[] = $image['id'];
                     $count++;
                 }
+
+            foreach($oldImages as $img) {
+                if (!in_array($img['id'], $newImages)) {
+                    $img->delete();
+                };
+            }
+
             $gallery->save();
             $response = $gallery;
         }
