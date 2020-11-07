@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateGalleryRequest;
+use App\Http\Requests\UpdateGalleryRequest;
 use App\Models\Gallery;
 use App\Models\Image;
 use App\Models\Comment;
@@ -117,32 +118,35 @@ class GalleryController extends Controller
      * @param  \App\Models\Gallery  $gallery
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateGalleryRequest $request, $id)
     {
         $user = auth()->user()->id;
-
+        $response = ['error' => 'you can not edit this!'];
         $gallery = Gallery::find($id);
-        $gallery->title = $request->title;
-        $gallery->description = $request->description;
-        $gallery->user_id = $user;
-        $gallery->save(); 
-        
-        $count=1;
-        foreach(request('images') as $img) {
-            $image = Image::find($img->id);
-            if (!$image) {
-                $image = Image::create([
-                    "url" => $img->url,
-                    "order_index" => $count,
-                    "gallery_id" => $gallery['id'],
-                ]);
-            } else {
-                $image->url = $img->url;
-                $image->order_index = $count;
-            };
-            $count++;
+        if ($gallery['author_id'] == $user) {
+            $gallery->title = $request->title;
+            $gallery->description = $request->description;
+            
+            $count=1;
+            
+            foreach($request->images as $img) {
+                if (!isset($img['id'])) {
+                    $image = Image::create([
+                        "url" => $img['url'],
+                        "order_index" => $count,
+                        "gallery_id" => $gallery['id'],
+                        ]);
+                    } else {
+                        $image = Image::find($img['id']);
+                        $img['order_index'] = $count;
+                        $image->update($img);
+                    };
+                    $count++;
+                }
+            $gallery->save();
+            $response = $gallery;
         }
-        return $gallery;
+        return $response;
     }
 
     /**

@@ -36,7 +36,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
     Route::put('/galleries/{id}', [GalleryController::class, 'update']);
-    Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
     Route::post('/galleries', [GalleryController::class, 'store']);
     Route::post('/galleries/{id}/comments', [CommentController::class, 'store']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
